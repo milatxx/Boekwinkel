@@ -19,6 +19,8 @@ namespace Boekwinkel.Domein
         public int Aantal { get; set; }
         public Aboperiode? Periode { get; set; } // voor tijdschriften
 
+        public event EventHandler<BesteldEventArgs>? Besteld;
+
         public Bestelling(T item, int aantal, Aboperiode? periode = null)
         {
             Id = 0;
@@ -46,7 +48,10 @@ namespace Boekwinkel.Domein
                 totaal = ts.Prijs * Aantal * verschijningen;
             }
 
-            return (Item.Isbn, Aantal, decimal.Round(totaal, 2));
+            totaal = decimal.Round(totaal, 2);
+
+            Besteld?.Invoke(this, new BesteldEventArgs(Id, Item.Isbn, Aantal, totaal));
+            return (Item.Isbn, Aantal, totaal);
         }
     }
 }
